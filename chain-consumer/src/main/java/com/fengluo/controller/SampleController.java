@@ -2,8 +2,8 @@ package com.fengluo.controller;
 
 import com.fengluo.common.WebResult;
 import com.fengluo.common.WebResultUtil;
-import com.fengluo.dto.response.ChainResponse;
-import com.fengluo.service.BusinessService;
+import com.fengluo.dto.response.SampleResponse;
+import com.fengluo.service.SampleService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,14 +19,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/test")
-public class BusinessController {
+public class SampleController {
 
     @Resource
-    private BusinessService businessService;
+    private SampleService sampleService;
 
     @GetMapping("/chain/{id}")
-    public WebResult<List<ChainResponse>> getChainResponse(@PathVariable("id") Long id) {
-        return WebResultUtil.success(businessService.invoke(id));
+    public WebResult<List<SampleResponse>> getChainResponse(@PathVariable("id") Long id) {
+        return WebResultUtil.success(sampleService.invoke(id));
     }
 
     @Value("${test:默认值}")

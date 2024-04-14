@@ -13,7 +13,7 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChainResponse {
+public class SampleResponse {
 
     private Boolean success;
 

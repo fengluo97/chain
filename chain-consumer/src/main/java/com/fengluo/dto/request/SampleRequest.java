@@ -11,7 +11,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChainRequest {
+public class SampleRequest {
 
     private Long businessId;
 

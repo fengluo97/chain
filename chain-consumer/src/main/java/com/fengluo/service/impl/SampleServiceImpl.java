@@ -1,10 +1,10 @@
 package com.fengluo.service.impl;
 
 import com.fengluo.common.DubboResult;
-import com.fengluo.dto.request.ChainRequest;
-import com.fengluo.dto.response.ChainResponse;
-import com.fengluo.facade.BusinessFacade;
-import com.fengluo.service.BusinessService;
+import com.fengluo.dto.request.SampleRequest;
+import com.fengluo.dto.response.SampleResponse;
+import com.fengluo.facade.SampleFacade;
+import com.fengluo.service.SampleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +18,15 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class BusinessServiceImpl implements BusinessService {
+public class SampleServiceImpl implements SampleService {
 
     @Resource
-    private BusinessFacade innerBusinessFacadeImpl;
+    private SampleFacade innerSampleFacadeImpl;
 
     @Override
-    public List<ChainResponse> invoke(Long id) {
-        List<ChainResponse> res = new ArrayList<>();
-        DubboResult<ChainResponse> dubboResult = innerBusinessFacadeImpl.invoke(ChainRequest.builder().businessId(10L).build());
+    public List<SampleResponse> invoke(Long id) {
+        List<SampleResponse> res = new ArrayList<>();
+        DubboResult<SampleResponse> dubboResult = innerSampleFacadeImpl.invoke(SampleRequest.builder().businessId(10L).build());
         if (dubboResult.isSuccess()) {
             res.add(dubboResult.getData());
         } else {

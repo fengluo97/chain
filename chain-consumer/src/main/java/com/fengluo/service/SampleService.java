@@ -1,6 +1,6 @@
 package com.fengluo.service;
 
-import com.fengluo.dto.response.ChainResponse;
+import com.fengluo.dto.response.SampleResponse;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ import java.util.List;
  * @Author: fengluo
  * @Date: 2024/4/10 22:24
  */
-public interface BusinessService {
+public interface SampleService {
 
     /**
      * 执行 invoke
      * @param id
      * @return
      */
-    List<ChainResponse> invoke(Long id);
+    List<SampleResponse> invoke(Long id);
 
 }
