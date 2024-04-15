@@ -1,5 +1,8 @@
 package com.fengluo.chain.chain;
 
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -7,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
  * @Author: fengluo
  * @Date: 2024/4/13 17:44
  */
+@Slf4j
 public class ChainFactory {
 
     /**
@@ -23,9 +27,9 @@ public class ChainFactory {
         chainProperties.validate();
         String chainImpl = chainProperties.getChainImpl();
         Class<?> chainImplClass = Class.forName(chainImpl);
-        Class<?> superclass;
+        Class<?> superclass = chainImplClass;
         while (true) {
-            superclass = chainImplClass.getSuperclass();
+            superclass = superclass.getSuperclass();
             if (superclass.equals(BaseChain.class)) {
                 break;
             }
@@ -33,7 +37,12 @@ public class ChainFactory {
                 throw new IllegalArgumentException("配置的节点类不是BaseChain的子类！");
             }
         }
-        return (BaseChain<?, ?>) chainImplClass.getConstructor(ChainProperties.class).newInstance(chainProperties);
+        log.info("开始创建");
+        Constructor<?> constructor = chainImplClass.getConstructor(ChainProperties.class);
+        log.info("开始创建 constructor {}", constructor);
+        BaseChain<?, ?> baseChain = (BaseChain<?, ?>) constructor.newInstance(chainProperties);
+        log.info("开始创建 baseChain {}", baseChain);
+        return baseChain;
     }
 
 }

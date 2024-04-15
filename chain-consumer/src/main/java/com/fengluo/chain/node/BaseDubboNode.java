@@ -1,5 +1,6 @@
 package com.fengluo.chain.node;
 
+import com.fengluo.client.dubbo.DubboReferenceContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -29,5 +30,18 @@ public abstract class BaseDubboNode<RE, RS, T> extends BaseNode<RE, RS> {
         this.referenceId = referenceId;
     }
 
+    /**
+     * 获取 DubboReferenceInterface 的 Class 对象
+     * @return
+     */
+    protected abstract Class<T> getDubboReferenceInterfaceClass();
+
+    /**
+     * 获取 Dubbo ReferenceConfig 的实例
+     * @return
+     */
+    public T getReferenceInstance() {
+        return DubboReferenceContainer.getInstance().getReferenceInstance(referenceId, getDubboReferenceInterfaceClass());
+    }
 
 }

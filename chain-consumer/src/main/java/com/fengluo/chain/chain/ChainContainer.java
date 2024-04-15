@@ -21,9 +21,9 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class ChainContainer {
 
-    private static Map<String, BaseChain<?, ?>> CHAIN_MAP = new HashMap<>(16);
+    private volatile static Map<String, BaseChain<?, ?>> CHAIN_MAP = new HashMap<>(16);
 
-    private static Map<String, ChainProperties> CHAIN_PROPERTIES_MAP = new HashMap<>(16);
+    private volatile Map<String, ChainProperties> chainPropertiesMap = new HashMap<>(16);
 
     private final Lock chainLock = new ReentrantLock();
 
@@ -31,7 +31,7 @@ public class ChainContainer {
         chainLock.lock();
         try {
             if (CollectionUtils.isNotEmpty(chainPropertiesList)) {
-                CHAIN_PROPERTIES_MAP = chainPropertiesList.stream()
+                chainPropertiesMap = chainPropertiesList.stream()
                         .filter(Objects::nonNull)
                         .peek(ChainProperties::validate)
                         .collect(HashMap::new, (map, chainProperties) -> map.put(chainProperties.getChainName(), chainProperties), HashMap::putAll);
@@ -47,13 +47,14 @@ public class ChainContainer {
      */
     public ChainContainer init() {
         chainLock.lock();
-        if (MapUtils.isEmpty(CHAIN_PROPERTIES_MAP)) {
+        if (MapUtils.isEmpty(chainPropertiesMap)) {
             return this;
         }
         try {
-            CHAIN_PROPERTIES_MAP.values().forEach(chainProperties -> {
+            chainPropertiesMap.values().forEach(chainProperties -> {
                 try {
                     BaseChain<?, ?> baseChain = ChainFactory.createBaseChain(chainProperties);
+                    log.info("创建了一个链条：{}", baseChain);
                     CHAIN_MAP.put(baseChain.getChainName(), baseChain);
                 } catch (Throwable e) {
                     throw new IllegalArgumentException("链条创建失败 ", e);
@@ -112,14 +113,14 @@ public class ChainContainer {
         log.info("更新链条开始");
         try {
             if (CollectionUtils.isEmpty(chainPropertiesList)) {
-                CHAIN_PROPERTIES_MAP = new HashMap<>(16);
+                chainPropertiesMap = new HashMap<>(16);
                 CHAIN_MAP = new HashMap<>(16);
             } else {
-                CHAIN_PROPERTIES_MAP = chainPropertiesList.stream()
+                chainPropertiesMap = chainPropertiesList.stream()
                         .filter(Objects::nonNull)
                         .peek(ChainProperties::validate)
                         .collect(HashMap::new, (map, chainProperties) -> map.put(chainProperties.getChainName(), chainProperties), HashMap::putAll);
-                CHAIN_PROPERTIES_MAP.values().forEach(chainProperties -> {
+                chainPropertiesMap.values().forEach(chainProperties -> {
                     try {
                         BaseChain<?, ?> baseChain = ChainFactory.createBaseChain(chainProperties);
                         CHAIN_MAP.put(baseChain.getChainName(), baseChain);

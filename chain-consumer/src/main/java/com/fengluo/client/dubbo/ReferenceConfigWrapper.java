@@ -74,26 +74,4 @@ public class ReferenceConfigWrapper<T> {
         return this.referenceConfig.getId();
     }
 
-    /**
-     * 销毁
-     */
-    public void destroy() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(this.dubboReferenceProperties.getTimeout() + 1000);
-            } catch (InterruptedException ignored) {
-            }
-            this.referenceConfig.destroy();
-        }).start();
-    }
-
-    /**
-     * 是否需求重新构造
-     * @param dubboReferenceProperties
-     * @return
-     */
-    public boolean needReconstruct(DubboReferenceProperties dubboReferenceProperties) {
-        return !this.dubboReferenceProperties.equals(dubboReferenceProperties);
-    }
-
 }

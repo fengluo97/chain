@@ -2,6 +2,7 @@ package com.fengluo.dto.response;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class SampleResponse {
+public class SampleResponse implements Serializable {
 
     private Boolean success;
 

@@ -23,9 +23,9 @@ public class NodeFactory {
         nodeProperties.validate();
         String nodeImpl = nodeProperties.getNodeImpl();
         Class<?> nodeImplClass = Class.forName(nodeImpl);
-        Class<?> superclass;
+        Class<?> superclass = nodeImplClass;
         while (true) {
-            superclass = nodeImplClass.getSuperclass();
+            superclass = superclass.getSuperclass();
             if (superclass.equals(BaseNode.class)) {
                 break;
             }

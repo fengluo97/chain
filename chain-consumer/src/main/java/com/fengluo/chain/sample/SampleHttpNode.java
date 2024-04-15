@@ -15,4 +15,9 @@ public class SampleHttpNode extends BaseHttpNode<SampleRequest, SampleResponse> 
         super(nodeProperties);
     }
 
+    @Override
+    protected Class<?> getResponseClass() {
+        return SampleResponse.class;
+    }
+
 }

@@ -7,10 +7,10 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>chain-consumer</artifactId>
+	<artifactId>chain-http-server</artifactId>
 	<packaging>jar</packaging>
 	
-	<name>chain-consumer</name>
+	<name>chain-http-server</name>
 	<url>http://maven.apache.org</url>
 	
 	<properties>
@@ -19,15 +19,15 @@
 	
 	<dependencies>
 		<dependency>
+			<groupId>com.fengluo</groupId>
+			<artifactId>chain-consumer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.ctrip.framework.apollo</groupId>
-			<artifactId>apollo-client</artifactId>
 		</dependency>
 	</dependencies>
 </project>

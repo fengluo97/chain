@@ -1,6 +1,7 @@
 package com.fengluo.chain.node;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import java.util.Objects;
  * @Date: 2024/4/10 22:40
  */
 @Data
+@ToString
 public abstract class BaseNode<RE, RS> implements Comparable<BaseNode<RE, RS>>, Comparator<BaseNode<RE, RS>> {
 
     /**
@@ -75,9 +77,9 @@ public abstract class BaseNode<RE, RS> implements Comparable<BaseNode<RE, RS>>, 
         if (o == null) {
             throw new NullPointerException("o1 is null");
         }
-        if (this.order < o.getOrder()) {
+        if (this.order > o.getOrder()) {
             return 1;
-        } else if (this.order > o.getOrder()) {
+        } else if (this.order < o.getOrder()) {
             return -1;
         }
         return 0;

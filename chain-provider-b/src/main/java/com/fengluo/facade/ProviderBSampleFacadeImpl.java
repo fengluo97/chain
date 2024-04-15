@@ -15,7 +15,7 @@ import java.util.Map;
  * @Date: 2024/4/10 22:53
  */
 @Slf4j
-@Service(version = "1.0.0", group = "providerBBusinessFacadeImpl")
+@Service(version = "1.0.0", group = "providerBSampleFacadeImpl")
 public class ProviderBSampleFacadeImpl implements SampleFacade {
 
     @Override

@@ -60,11 +60,6 @@
     </dependency>
     
     <dependency>
-      <groupId>com.ctrip.framework.apollo</groupId>
-      <artifactId>apollo-client</artifactId>
-    </dependency>
-    
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
@@ -77,6 +72,11 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
     </dependency>
   </dependencies>
   
@@ -117,6 +117,12 @@
         <groupId>com.alibaba</groupId>
         <artifactId>fastjson</artifactId>
         <version>1.2.78</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.5.6</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -29,18 +29,27 @@ public class SampleChain extends BaseChain<SampleRequest, SampleResponse> {
         if (CollectionUtils.isEmpty(this.nodes)) {
             return sampleResponse;
         }
+        log.info("获得节点：{}", nodes);
         for (BaseNode<SampleRequest, SampleResponse> node : nodes) {
-            if (node == null || node.isForbidden()) {
-                log.info("当前节点为空，或者节点被禁用");
-                continue;
-            }
-            SampleResponse response = node.invoke(request);
-            if (!response.getSuccess()) {
-                Map<String, Object> params = sampleResponse.getParams();
-                params.putAll(response.getParams());
-                sampleResponse.setSuccess(false);
-                sampleResponse.setParams(params);
-                return sampleResponse;
+            try {
+                if (node == null || node.isForbidden()) {
+                    log.info("当前节点为空，或者节点被禁用");
+                    continue;
+                }
+                SampleResponse response = node.invoke(request);
+                log.info("节点：{}", node.getNodeName());
+                log.info("节点调用：{}", request);
+                log.info("返回结果：{}", response);
+                if (!response.getSuccess()) {
+                    Map<String, Object> params = sampleResponse.getParams();
+                    params.putAll(response.getParams());
+                    sampleResponse.setSuccess(false);
+                    sampleResponse.setParams(params);
+                    return sampleResponse;
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                log.info("节点node: {} 执行失败", node.getNodeName());
             }
         }
         return sampleResponse;
