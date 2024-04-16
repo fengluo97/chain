@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-public class ChainConfig {
+public class ChainContainerConfig {
 
     public final static String CHAIN_NAMESPACE = "chain";
 

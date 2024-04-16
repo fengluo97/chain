@@ -2,7 +2,6 @@ package com.fengluo.chain.chain;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -14,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 public class ChainFactory {
 
     /**
-     * 根据链条配置创建单个链条类
+     * 根据链条配置创建单个链条类，基于反射api jdk1.5
      * @param chainProperties
      * @return
      * @throws ClassNotFoundException
@@ -37,12 +36,7 @@ public class ChainFactory {
                 throw new IllegalArgumentException("配置的节点类不是BaseChain的子类！");
             }
         }
-        log.info("开始创建");
-        Constructor<?> constructor = chainImplClass.getConstructor(ChainProperties.class);
-        log.info("开始创建 constructor {}", constructor);
-        BaseChain<?, ?> baseChain = (BaseChain<?, ?>) constructor.newInstance(chainProperties);
-        log.info("开始创建 baseChain {}", baseChain);
-        return baseChain;
+        return (BaseChain<?, ?>) chainImplClass.getConstructor(ChainProperties.class).newInstance(chainProperties);
     }
 
 }

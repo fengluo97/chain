@@ -33,11 +33,11 @@ public class SampleDubboNode extends BaseDubboNode<SampleRequest, SampleResponse
         try {
             response = getReferenceInstance().invoke(request);
             if (!response.isSuccess()) {
-                throw new IllegalArgumentException("dubbo call 异常！" + response.getRspDesc());
+                throw new RuntimeException("dubbo call 异常！" + response.getRspDesc());
             }
         } catch (Throwable e) {
-            log.info("节点 dubbo invoke 失败: {}, {}", this, e.getMessage());
-            throw new RuntimeException("节点 dubbo invoke 失败");
+            e.printStackTrace();
+            throw new RuntimeException("节点 " + this.getNodeName() + " dubbo invoke 失败");
         }
         return response.getData();
     }

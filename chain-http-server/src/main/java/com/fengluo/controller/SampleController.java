@@ -22,9 +22,6 @@ import java.util.Map;
 @RequestMapping("/sample")
 public class SampleController {
 
-    @Resource
-    private SampleService sampleService;
-
     @PostMapping("/chainA")
     public WebResult<SampleResponse> chainA(@RequestBody SampleRequest sampleRequest) {
         SampleResponse sampleResponse = new SampleResponse();

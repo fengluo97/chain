@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 public class NodeFactory {
 
     /**
-     * 根据节点配置创建单个节点
+     * 根据节点配置创建单个节点，基于反射api创建
      * @param nodeProperties
      * @return
      * @throws ClassNotFoundException

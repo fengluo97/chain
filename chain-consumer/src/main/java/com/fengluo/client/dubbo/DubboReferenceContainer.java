@@ -22,9 +22,12 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class DubboReferenceContainer {
 
-    private static DubboReferenceContainer DUBBO_REFERENCE_CONTAINER;
+    /**
+     * 单例实例，volatile禁止指令重排序
+     */
+    private volatile static DubboReferenceContainer DUBBO_REFERENCE_CONTAINER;
 
-    private Map<String, ReferenceConfigWrapper<?>> referenceConfigWrapperMap = new HashMap<>(16);
+    private volatile Map<String, ReferenceConfigWrapper<?>> referenceConfigWrapperMap = new HashMap<>(16);
 
     private volatile Map<String, DubboReferenceProperties> dubboReferencePropertiesMap = new HashMap<>(16);
 
@@ -32,8 +35,9 @@ public class DubboReferenceContainer {
 
     private final List<RegistryConfig> registryConfigs;
 
-    private final Lock containerLock = new ReentrantLock();
+    private final Lock containerUpdateLock = new ReentrantLock();
 
+    // dubbo check
     public DubboReferenceContainer(ApplicationConfig applicationConfig, List<RegistryConfig> registryConfigs, List<DubboReferenceProperties> dubboReferencePropertiesList) {
         if (DUBBO_REFERENCE_CONTAINER != null) {
             throw new IllegalArgumentException("DubboReferenceContainer 正在重复初始化！");
@@ -68,7 +72,7 @@ public class DubboReferenceContainer {
     }
 
     public <T> T getReferenceInstance(String referenceId, Class<T> referenceClass) {
-        ReferenceConfigWrapper<?> referenceConfigWrapper = referenceConfigWrapperMap.get(referenceId);
+        ReferenceConfigWrapper<?> referenceConfigWrapper = this.referenceConfigWrapperMap.get(referenceId);
         if (referenceConfigWrapper == null) {
             return null;
         }
@@ -80,17 +84,17 @@ public class DubboReferenceContainer {
     }
 
     public DubboReferenceContainer init() {
-        this.containerLock.lock();
+        this.containerUpdateLock.lock();
         try {
             this.dubboReferencePropertiesMap.values().forEach(dubboReferenceProperties -> {
-                ReferenceConfigWrapper<?> referenceConfigWrapper = new ReferenceConfigWrapper<>(applicationConfig, registryConfigs, dubboReferenceProperties);
+                ReferenceConfigWrapper<?> referenceConfigWrapper = new ReferenceConfigWrapper<>(this.applicationConfig, this.registryConfigs, dubboReferenceProperties);
                 log.info("ReferenceConfig 初始化成功：{}", JSON.toJSONString(referenceConfigWrapper.getDubboReferenceProperties()));
-                referenceConfigWrapperMap.put(referenceConfigWrapper.getId(), referenceConfigWrapper);
+                this.referenceConfigWrapperMap.put(referenceConfigWrapper.getId(), referenceConfigWrapper);
             });
             registerApolloConfigListener();
             return this;
         } finally {
-            this.containerLock.unlock();
+            this.containerUpdateLock.unlock();
         }
     }
 
@@ -105,13 +109,14 @@ public class DubboReferenceContainer {
                 }
                 this.update(dubboReferencePropertiesList);
             } catch (Throwable e) {
+                e.printStackTrace();
                 log.error("更新 Dubbo Container 失败！" + e);
             }
         });
     }
 
     private void update(List<DubboReferenceProperties> dubboReferencePropertiesList) {
-        this.containerLock.lock();
+        this.containerUpdateLock.lock();
         try {
             if (CollectionUtils.isNotEmpty(dubboReferencePropertiesList)) {
                 this.dubboReferencePropertiesMap = dubboReferencePropertiesList.stream()
@@ -122,17 +127,18 @@ public class DubboReferenceContainer {
                 this.dubboReferencePropertiesMap = new HashMap<>(16);
             }
             if (MapUtils.isNotEmpty(this.dubboReferencePropertiesMap)) {
-                this.referenceConfigWrapperMap = new HashMap<>();
+                Map<String, ReferenceConfigWrapper<?>> referenceConfigWrapperMapTemp = new HashMap<>();
                 this.dubboReferencePropertiesMap.values().forEach(dubboReferenceProperties -> {
                     ReferenceConfigWrapper<?> referenceConfigWrapper = new ReferenceConfigWrapper<>(applicationConfig, registryConfigs, dubboReferenceProperties);
                     log.info("ReferenceConfig 初始化成功：{}", JSON.toJSONString(referenceConfigWrapper.getDubboReferenceProperties()));
-                    referenceConfigWrapperMap.put(referenceConfigWrapper.getId(), referenceConfigWrapper);
+                    referenceConfigWrapperMapTemp.put(referenceConfigWrapper.getId(), referenceConfigWrapper);
                 });
+                this.referenceConfigWrapperMap = referenceConfigWrapperMapTemp;
             } else {
                 this.referenceConfigWrapperMap = new HashMap<>();
             }
         } finally {
-            this.containerLock.unlock();
+            this.containerUpdateLock.unlock();
         }
     }
 

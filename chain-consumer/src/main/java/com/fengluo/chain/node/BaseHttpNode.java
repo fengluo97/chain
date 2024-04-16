@@ -1,8 +1,9 @@
 package com.fengluo.chain.node;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.fengluo.client.http.HttpClientUtil;
+import com.fengluo.common.WebResult;
 import com.fengluo.util.SpringUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,11 +24,7 @@ public abstract class BaseHttpNode<RE, RS> extends BaseNode<RE, RS> {
 
     private static final String HTTP_URL = "httpUrl";
 
-    private static final String TIMEOUT = "timeout";
-
     protected String httpUrl;
-
-    protected long timeout = 3000;
 
     public BaseHttpNode(NodeProperties nodeProperties) {
         super(nodeProperties);
@@ -37,17 +34,13 @@ public abstract class BaseHttpNode<RE, RS> extends BaseNode<RE, RS> {
             throw new IllegalArgumentException("节点配置的httpUrl为空！");
         }
         this.httpUrl = httpUrl;
-        String timeout = nodeParams.get(TIMEOUT);
-        if (StringUtils.isNotBlank(timeout)) {
-            this.timeout = Long.parseLong(timeout);
-        }
     }
 
     protected abstract Class<?> getResponseClass();
 
     @Override
     public RS invoke(RE request) {
-        String response = null;
+        String response;
         try {
             response = getHttpClientUtil().post(httpUrl, null, JSON.toJSONString(request));
             log.info("response return:{}", response);
@@ -55,14 +48,11 @@ public abstract class BaseHttpNode<RE, RS> extends BaseNode<RE, RS> {
             e.printStackTrace();
             throw new RuntimeException("http 节点执行失败！");
         }
-        JSONObject webResult = JSON.parseObject(response);
+        WebResult<RS> webResult = JSON.parseObject(response, new TypeReference<WebResult<RS>>() {});
         if (webResult == null) {
             throw new RuntimeException("http 返回结果为空！");
         }
-        String rspCode = webResult.getString("rspCode");
-        String rspDesc = webResult.getString("rspDesc");
-        String data = webResult.getString("data");
-        return ((RS) JSON.parseObject(data, getResponseClass()));
+        return (RS) JSON.parseObject(JSON.toJSONString(webResult.getData()), getResponseClass());
     }
 
     private HttpClientUtil getHttpClientUtil() {

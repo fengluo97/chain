@@ -26,10 +26,7 @@ public class SampleServiceImpl implements SampleService {
     @Override
     public List<SampleResponse> invoke(Long id) {
         SampleChain sampleChain = chainContainer.getChain("sampleChain", SampleChain.class);
-        List<SampleResponse> res = new ArrayList<>();
-        SampleResponse invoke = sampleChain.invoke(SampleRequest.builder().businessId(id).build());
-        res.add(invoke);
-        return res;
+        return sampleChain.invokeList(SampleRequest.builder().businessId(id).build());
     }
 
 }

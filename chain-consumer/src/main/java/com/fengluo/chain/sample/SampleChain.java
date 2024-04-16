@@ -8,6 +8,8 @@ import com.fengluo.dto.response.SampleResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +19,6 @@ import java.util.Map;
  */
 @Slf4j
 public class SampleChain extends BaseChain<SampleRequest, SampleResponse> {
-
 
     public SampleChain(ChainProperties chainProperties) {
         super(chainProperties);
@@ -30,30 +31,52 @@ public class SampleChain extends BaseChain<SampleRequest, SampleResponse> {
             return sampleResponse;
         }
         log.info("获得节点：{}", nodes);
-        for (BaseNode<SampleRequest, SampleResponse> node : nodes) {
+        for (BaseNode<SampleRequest, SampleResponse> node : this.nodes) {
+            if (node == null || node.isForbidden()) {
+                log.info("当前节点为空，或者节点被禁用");
+                continue;
+            }
             try {
-                if (node == null || node.isForbidden()) {
-                    log.info("当前节点为空，或者节点被禁用");
-                    continue;
-                }
-                SampleResponse response = node.invoke(request);
+                sampleResponse = node.invoke(request);
                 log.info("节点：{}", node.getNodeName());
-                log.info("节点调用：{}", request);
-                log.info("返回结果：{}", response);
-                if (!response.getSuccess()) {
+                log.info("返回结果：{}", sampleResponse);
+                if (!sampleResponse.getSuccess()) {
                     Map<String, Object> params = sampleResponse.getParams();
-                    params.putAll(response.getParams());
+                    params.putAll(sampleResponse.getParams());
                     sampleResponse.setSuccess(false);
                     sampleResponse.setParams(params);
                     return sampleResponse;
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
-                log.info("节点node: {} 执行失败", node.getNodeName());
+                throw new RuntimeException("节点node: " + node.getNodeName() + "执行失败");
             }
         }
         return sampleResponse;
     }
 
+    public List<SampleResponse> invokeList(SampleRequest request) {
+        List<SampleResponse> sampleResponseList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(this.nodes)) {
+            return sampleResponseList;
+        }
+        log.info("获得节点：{}", nodes);
+        for (BaseNode<SampleRequest, SampleResponse> node : this.nodes) {
+            if (node == null || node.isForbidden()) {
+                log.info("当前节点为空，或者节点被禁用");
+                continue;
+            }
+            try {
+                SampleResponse sampleResponse = node.invoke(request);
+                log.info("节点：{}", node.getNodeName());
+                log.info("返回结果：{}", sampleResponse);
+                sampleResponseList.add(sampleResponse);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new RuntimeException("节点node: " + node.getNodeName() + "执行失败");
+            }
+        }
+        return sampleResponseList;
+    }
 
 }
